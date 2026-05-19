@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>도전! RISE 골든벨 🔔</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-dark: #1F4E79;
+    --blue-mid: #2E75B6;
+    --blue-light: #DDEBF7;
+    --green-dark: #375623;
+    --green-light: #E2EFDA;
+    --yellow-dark: #7F6000;
+    --yellow-light: #FFF2CC;
+    --red: #C62828;
+    --bg: #F5F7FA;
+    --white: #ffffff;
+    --text: #1a1a2e;
+    --text-muted: #6B7280;
+    --border: #E5E7EB;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(31,78,121,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── 인트로 화면 ── */
+  #intro {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1F4E79 0%, #2E75B6 60%, #4A90D9 100%);
+    padding: 2rem;
+    text-align: center;
+  }
+  .intro-bell { font-size: 72px; margin-bottom: 1rem; animation: bell 1.2s ease-in-out infinite alternate; }
+  @keyframes bell { from { transform: rotate(-12deg); } to { transform: rotate(12deg); } }
+  .intro-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    color: #fff;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    margin-bottom: 0.5rem;
+  }
+  .intro-sub { color: rgba(255,255,255,0.85); font-size: 1rem; margin-bottom: 0.5rem; }
+  .intro-org { color: rgba(255,255,255,0.6); font-size: 0.875rem; margin-bottom: 2.5rem; }
+  .intro-stats {
+    display: flex; gap: 1rem; margin-bottom: 2.5rem; flex-wrap: wrap; justify-content: center;
+  }
+  .stat-chip {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 999px;
+    padding: 6px 18px;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  .start-btn {
+    background: #fff;
+    color: var(--blue-dark);
+    border: none;
+    border-radius: 999px;
+    padding: 14px 48px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
+
+  /* ── 메인 퀴즈 ── */
+  #quiz { display: none; min-height: 100vh; padding: 1rem; }
+  .quiz-inner { max-width: 720px; margin: 0 auto; }
+
+  /* 헤더 */
+  .quiz-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 1rem;
+  }
+  .quiz-logo { font-family: 'Black Han Sans', sans-serif; font-size: 1.1rem; color: var(--blue-dark); }
+  .quiz-counter { font-size: 0.875rem; color: var(--text-muted); background: var(--bg); padding: 4px 12px; border-radius: 999px; }
+
+  /* 라운드 탭 */
+  .round-tabs { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .rtab {
+    padding: 7px 16px; border-radius: 999px; border: 1.5px solid var(--border);
+    cursor: pointer; font-size: 0.8rem; font-weight: 500;
+    background: var(--white); color: var(--text-muted);
+    transition: all 0.15s; font-family: 'Noto Sans KR', sans-serif;
+  }
+  .rtab.ox.active   { background: var(--green-light); color: var(--green-dark); border-color: #4CAF50; }
+  .rtab.mc.active   { background: var(--blue-light);  color: var(--blue-dark);  border-color: var(--blue-mid); }
+  .rtab.sa.active   { background: var(--yellow-light); color: var(--yellow-dark); border-color: #F9A825; }
+
+  /* 진행 바 */
+  .progress-wrap { background: var(--border); border-radius: 999px; height: 6px; margin-bottom: 1.25rem; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 999px; transition: width 0.4s ease; }
+  .r1 { background: linear-gradient(90deg, #4CAF50, #81C784); }
+  .r2 { background: linear-gradient(90deg, var(--blue-dark), var(--blue-mid)); }
+  .r3 { background: linear-gradient(90deg, #F9A825, #FFD54F); }
+
+  /* 카드 */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.75rem;
+    margin-bottom: 1rem;
+    animation: fadeUp 0.3s ease;
+  }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  .round-label {
+    display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px;
+    border-radius: 999px; margin-bottom: 10px; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .lbl-ox { background: var(--green-light); color: var(--green-dark); }
+  .lbl-mc { background: var(--blue-light);  color: var(--blue-dark); }
+  .lbl-sa { background: var(--yellow-light); color: var(--yellow-dark); }
+
+  .q-num { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+  .q-text {
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    font-weight: 500; line-height: 1.75;
+    margin-bottom: 1.25rem;
+    word-break: keep-all;
+  }
+  .blank {
+    display: inline-block;
+    min-width: 72px;
+    border-bottom: 2.5px solid var(--blue-dark);
+    padding: 0 4px;
+    text-align: center;
+    color: var(--blue-dark);
+    font-weight: 700;
+  }
+
+  /* OX 버튼 */
+  .ox-row { display: flex; gap: 12px; margin-bottom: 1rem; }
+  .ox-btn {
+    flex: 1; padding: 22px;
+    border-radius: var(--radius); border: 2px solid var(--border);
+    font-size: 2.5rem; font-weight: 900; cursor: pointer;
+    background: var(--white); transition: transform 0.12s, box-shadow 0.12s;
+    font-family: 'Black Han Sans', sans-serif;
+  }
+  .ox-btn:hover { transform: scale(1.04); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .ox-btn.o { border-color: #4CAF50; color: #2E7D32; background: #F1F8E9; }
+  .ox-btn.x { border-color: #E53935; color: #B71C1C; background: #FDECEA; }
+
+  /* 보기 */
+  .opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .opt {
+    padding: 10px 14px; border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--bg); color: var(--text-muted);
+    font-size: 0.9rem; font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.15s;
+  }
+  .opt.correct { background: var(--green-light); border-color: #4CAF50; color: var(--green-dark); font-weight: 700; }
+
+  /* 정답 박스 */
+  .ans-box {
+    display: none; padding: 16px 20px; border-radius: var(--radius);
+    margin-bottom: 1rem; animation: fadeUp 0.25s ease;
+  }
+  .ans-box.show { display: block; }
+  .ans-box.ox-o { background: var(--green-light); border: 2px solid #4CAF50; }
+  .ans-box.ox-x { background: #FDECEA; border: 2px solid #E53935; }
+  .ans-box.mc   { background: var(--blue-light); border: 2px solid var(--blue-mid); }
+  .ans-box.sa   { background: var(--yellow-light); border: 2px solid #F9A825; }
+  .ans-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .ans-value { font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 4px; word-break: keep-all; }
+  .ans-tip { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
+
+  /* 네비 */
+  .nav-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nav-btn {
+    padding: 10px 22px; border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: var(--white); color: var(--text);
+    cursor: pointer; font-size: 0.875rem; font-weight: 600;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.15s;
+  }
+  .nav-btn:hover { background: var(--bg); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-btn.primary { background: var(--blue-dark); color: #fff; border-color: var(--blue-dark); }
+  .nav-btn.primary:hover { background: #163C60; }
+  .nav-btn.danger  { background: var(--red); color: #fff; border-color: var(--red); }
+
+  /* 종료 화면 */
+  #end { display: none; min-height: 100vh; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 2rem;
+    background: linear-gradient(135deg, #1F4E79 0%, #2E75B6 100%); }
+  .end-trophy { font-size: 80px; margin-bottom: 1rem; animation: bounce 0.6s ease infinite alternate; }
+  @keyframes bounce { to { transform: translateY(-12px); } }
+  .end-title { font-family: 'Black Han Sans', sans-serif; font-size: 2rem; color: #fff; margin-bottom: 0.5rem; }
+  .end-sub { color: rgba(255,255,255,0.8); font-size: 0.95rem; margin-bottom: 2rem; }
+
+  @media (max-width: 480px) {
+    .card { padding: 1.25rem; }
+    .ox-btn { padding: 16px; font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 인트로 -->
+<div id="intro">
+  <div class="intro-bell">🔔</div>
+  <div class="intro-title">도전! RISE 골든벨</div>
+  <div class="intro-sub">2차년도 단위과제 · 프로그램 · 매뉴얼</div>
+  <div class="intro-org">조선대학교 RISE사업단 워크숍</div>
+  <div class="intro-stats">
+    <span class="stat-chip">🟢 1라운드 OX 10문항</span>
+    <span class="stat-chip">🔵 2라운드 객관식 10문항</span>
+    <span class="stat-chip">🟡 3라운드 주관식 10문항</span>
+  </div>
+  <button class="start-btn" onclick="startQuiz()">시작하기 →</button>
+</div>
+
+<!-- 퀴즈 -->
+<div id="quiz">
+  <div class="quiz-inner">
+    <div class="quiz-header">
+      <div class="quiz-logo">🔔 RISE 골든벨</div>
+      <div class="quiz-counter" id="counter">1 / 10</div>
+    </div>
+    <div class="round-tabs" id="tabs"></div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog"></div></div>
+    <div class="card" id="qcard"></div>
+    <div class="nav-row" id="nav"></div>
+  </div>
+</div>
+
+<!-- 종료 -->
+<div id="end" style="display:none; min-height:100vh; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:2rem; background:linear-gradient(135deg,#1F4E79,#2E75B6);">
+  <div class="end-trophy">🏆</div>
+  <div class="end-title">골든벨 완료!</div>
+  <div class="end-sub">RISE사업단 워크숍 수고 많으셨습니다.<br>조선대학교 RISE사업단 화이팅!</div>
+  <button class="start-btn" onclick="restart()">처음부터 다시</button>
+</div>
+
+<script>
+const B = '<span class="blank">　　　　</span>';
+
+const rounds = [
+  {
+    id:"ox", label:"1라운드 · OX", short:"OX", cls:"ox", prog:"r1",
+    qs:[
+      {sit:"학생이 '지역 기업에서 현장실습 하고 싶어요!'라고 했을 때, 우리 사업단이 연결해주는 프로그램 이름에 'INNO'가 들어간다.", q:"위 설명은 사실이다.", a:"O", tip:"G-INNO = 지역 연계 현장실습 프로그램"},
+      {sit:"G-LAMP는 'Global Artificial intelligence Multi-field Program'의 약자이다.", q:"위 설명은 사실이다.", a:"O", tip:"G-LAMP: AI 교육 프로그램 브랜드명"},
+      {sit:"'런체인지(LearnChange)'는 외국인 유학생 취업 박람회 프로그램이다.", q:"위 설명은 사실이다.", a:"X", tip:"런체인지는 Summer/Winter Camp 운영 프로그램. 유학생 취업 박람회는 G-링크인"},
+      {sit:"광(光)마을 사업에서 '빛모아'는 지역사회 자원공유 플랫폼의 브랜드명이다.", q:"위 설명은 사실이다.", a:"O", tip:"광(光)마을 빛모아 플랫폼 운영"},
+      {sit:"CSU 창업챌린지는 R&D 기반 혁신 실증 스튜디오 사업의 프로그램이다.", q:"위 설명은 사실이다.", a:"X", tip:"CSU 창업챌린지는 창업밸리 스타트업 아카데미(2-1) 소속"},
+      {sit:"G-ACT의 'ACT'는 Art, Culture, Tourism의 약자이다.", q:"위 설명은 사실이다.", a:"O", tip:"G-ACT = 문화예술·관광 브랜드"},
+      {sit:"'PUSH업(業)' 프로그램은 취업 집중 지원 트랙별 프로그램이다.", q:"위 설명은 사실이다.", a:"O", tip:"1-1-4. 지역산업 친화형 취업 WINNER 소속"},
+      {sit:"늘봄 싱크탱크 사업은 우리 사업단이 직접 운영하는 지역 돌봄 연구·교육 과제이다.", q:"위 설명은 사실이다.", a:"O", tip:"3-4. 늘봄 싱크탱크 대학 운영"},
+      {sit:"매뉴얼에 따르면, 출장을 마친 후 결과보고 내부문서는 출장 다음날부터 2주일 이내에 제출해야 한다.", q:"위 설명은 사실이다.", a:"O", tip:"매뉴얼 여비 집행 유의사항: 출장 마친 다음날부터 2주일 이내 출장 결과보고 공문 및 관련 증빙 구비 요청"},
+      {sit:"매뉴얼에 따르면, 100만원 이상 구매 시 비교 대상 타업체 견적서는 2부 이상 추가로 첨부해야 한다.", q:"위 설명은 사실이다.", a:"X", tip:"1부 이상이 맞다. 매뉴얼 필수 지출증빙서류 전 항목 공통 기준"},
+    ]
+  },
+  {
+    id:"mc", label:"2라운드 · 객관식", short:"객관식", cls:"mc", prog:"r2",
+    qs:[
+      {q:`지역 연계 현장실습 프로그램의 영문 약칭은 ${B}이다.`, opts:["① G-REAL","② G-HARMONY","③ G-INNO","④ G-INTER"], a:"③", tip:"G-INNO = 지역 기업 연계 현장실습 프로그램"},
+      {q:`유학생 채용 박람회 및 정착 교육을 담당하는 글로벌 프로그램은 ${B}이다.`, opts:["① 빛고을 Stay","② 런체인지","③ 광주IN스타","④ G-링크인"], a:"④", tip:"G-링크인: 유학생 채용 박람회 + 정착 교육 (4-4-3)"},
+      {q:`RISE사업으로 개발된 교재·출판물에는 국제표준도서번호인 ${B}을 발급받아 공식 등록해야 한다.`, opts:["① ISSN","② ISBN","③ DOI","④ ISRC"], a:"②", tip:"ISBN = International Standard Book Number. 매뉴얼 사업 산출물 관리 기준"},
+      {q:`광주인재지원금 중 멘토링·튜터링 지급한도는 학부생 기준 월 ${B}이다.`, opts:["① 200,000원","② 250,000원","③ 300,000원","④ 500,000원"], a:"③", tip:"학부생 15,000원 이하/시간, 월 300,000원 한도. 석·박사는 월 500,000원"},
+      {q:`장미축제 기간에 맞춰 RISE사업단이 독자적으로 운영하는 봄 행사는 ${B}이다.`, opts:["① G-ACT 그랜드 페스티벌","② G-ACT 브릿지","③ G-ACT 스프링 페스타","④ G-ACT 성탄 문화 축제"], a:"③", tip:"G-ACT 스프링 페스타 — 장미축제 연계 사업단 자체 행사 (3-3-3)"},
+      {q:`3천만원 이상 1억원 미만 장비·기자재 구입 시, 대학 심의·의결 후 ${B}의 사전 승인을 받아야 한다.`, opts:["① 교육부","② 중앙RISE센터","③ 광주RISE센터","④ 산학협력단"], a:"③", tip:"1억원 이상은 중앙RISE센터 승인 필요"},
+      {q:`사업비 집행 시 회의비 식비는 1인 1식 ${B} 이내로 집행해야 한다.`, opts:["① 20,000원","② 30,000원","③ 40,000원","④ 50,000원"], a:"④", tip:"다과만 집행 시에는 최대 10,000원 이내/인,일"},
+      {q:`소상공인을 대상으로 창업·경영 역량을 키워주는 평생교육 프로그램은 ${B}이다.`, opts:["① 재직자 전문역량 업스킬링 아카데미","② 소상공인 성공 스케일업 아카데미","③ DX 평생교육 아카데미","④ 이음 사다리"], a:"②", tip:"4-3-2. 소상공인 성공 스케일업 아카데미"},
+      {q:`RISE사업 집행 관련 증빙서류는 사업 종료 후 ${B} 보관해야 한다.`, opts:["① 1년","② 3년","③ 5년","④ 10년"], a:"③", tip:"매뉴얼 제12조: 사업 종료 후 5년간 보관 의무"},
+      {q:`광주인재지원금 인재육성 장려금의 1인당 지급 한도는 사업기간 내 ${B} 이내이다.`, opts:["① 100만원","② 150만원","③ 200만원","④ 300만원"], a:"③", tip:"15시간당 25만원 이내, 사업기간 내 1인당 최대 200만원"},
+    ]
+  },
+  {
+    id:"sa", label:"3라운드 · 주관식", short:"주관식", cls:"sa", prog:"r3",
+    qs:[
+      {q:`지역 융합전공을 개발·운영하는 프로그램의 영문명은 ${B}이다.`, a:"G-HARMONY", tip:"G-HARMONY = 지역연계 융합전공 개발·운영 (1-1-2)"},
+      {q:`리빙랩 활동 성과를 영상으로 제작해 정책에 반영하는 프로그램은 ${B}이다.`, a:"리빙랩 정책 확산 영상물 제작", tip:"3-1-3. 리빙랩 성과 확산"},
+      {q:`창업팀이 시제품까지 만든 후 투자자를 만나는 단계에서 활용하는 프로그램은 ${B}이다.`, a:"IR 프로그램", tip:"2-1-5. 창업확산기 — IR 프로그램"},
+      {q:`취약계층을 위한 3가지 사다리 프로그램은 ${B}, ${B}, ${B}이다.`, a:"이음 사다리 / 마음 사다리 / 활력 사다리", tip:"4-3-3. 이음 사다리 / 마음 사다리 / 활력 사다리"},
+      {q:`간접비는 산학협력단 ${B}%, RISE사업단 ${B}%로 편성하여 집행한다.`, a:"각각 50% / 50%", tip:"매뉴얼 제22조: 간접비는 산학협력단 50%, RISE사업단 50%"},
+      {q:`MECA 재직자 대상 문제해결 중심 교육 프로그램은 ${B}이다.`, a:"PBL 기반 업스킬링 아카데미", tip:"1-2-4. 산학연 협력 기반 재직자 역량 강화"},
+      {q:`지역주민 대상 도서관 프로그램의 명칭은 ${B}이다.`, a:"CSU 북(Book) 피크닉", tip:"4-1-4. 광(光)마을 이음 아카데미 — 도서관 프로그램"},
+      {q:`신진 연구자 지원 프로그램의 영문 별칭은 ${B}이며, MECA 인재양성 과제 소속이다.`, a:"Rookie", tip:"1-2-2. MECA 맞춤형 연구 활동 지원 — 신진 연구자(Rookie) 연구지원"},
+      {q:`e나라도움 카드 사용제한 업종 5가지는 유흥업종, ${B}, 레저업종, ${B}, 기타업종이다.`, a:"위생업종 / 사행업종", tip:"유흥·위생·레저·사행·기타 — 골프장·노래방·카지노·사우나·성인용품점 등"},
+      {q:`회의비 집행은 ${B}시부터 ${B}시 사이에만 가능하며, 공휴일·심야 집행은 원칙상 불가하다.`, a:"09시 ~ 22시", tip:"매뉴얼: 회의비 집행은 09:00~22:00 내에 이뤄져야 함"},
+    ]
+  }
+];
+
+let ri=0, qi=0, shown=false;
+const R=()=>rounds[ri];
+const Q=()=>R().qs[qi];
+
+function startQuiz(){
+  document.getElementById('intro').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  render();
+}
+function restart(){
+  ri=0; qi=0; shown=false;
+  document.getElementById('end').style.display='none';
+  document.getElementById('intro').style.display='flex';
+}
+
+function render(){
+  const r=R(), q=Q(), total=r.qs.length;
+  const pct=Math.round(((qi+(shown?1:0))/total)*100);
+
+  // counter
+  document.getElementById('counter').textContent=`${qi+1} / ${total}`;
+
+  // tabs
+  document.getElementById('tabs').innerHTML=rounds.map((rv,i)=>
+    `<div class="rtab ${rv.cls}${i===ri?' active':''}" onclick="goRound(${i})">${rv.short}</div>`
+  ).join('');
+
+  // progress
+  const pf=document.getElementById('prog');
+  pf.style.width=pct+'%';
+  pf.className='progress-fill '+r.prog;
+
+  // card
+  const isOX=r.id==='ox', isMC=r.id==='mc';
+  const lbl=r.id==='ox'?'lbl-ox':r.id==='mc'?'lbl-mc':'lbl-sa';
+  const sitHtml=q.sit?`<div style="font-size:14px;color:#6B7280;background:#F5F7FA;border-left:3px solid #D1D5DB;padding:10px 14px;border-radius:0 10px 10px 0;margin-bottom:12px;line-height:1.6">${q.sit}</div>`:'';
+
+  let body='';
+  if(isOX){
+    const cls=q.a==='O'?'ox-o':'ox-x';
+    const oxBtns=!shown?`<div class="ox-row"><button class="ox-btn o" onclick="reveal()">O</button><button class="ox-btn x" onclick="reveal()">X</button></div>`:'';
+    body=`${oxBtns}<div class="ans-box ${cls}${shown?' show':''}"><div class="ans-label">정답</div><div class="ans-value" style="font-size:2rem">${q.a==='O'?'O (맞다)':'X (틀리다)'}</div>${q.tip?`<div class="ans-tip">${q.tip}</div>`:''}</div>`;
+  } else if(isMC){
+    const opts=q.opts.map(o=>{
+      const ok=shown&&o.startsWith(q.a);
+      return `<div class="opt${ok?' correct':''}">${o}${ok?' ✓':''}</div>`;
+    }).join('');
+    body=`<div class="opts">${opts}</div><div class="ans-box mc${shown?' show':''}"><div class="ans-label">정답</div><div class="ans-value">${q.a}</div>${q.tip?`<div class="ans-tip">${q.tip}</div>`:''}</div>`;
+  } else {
+    body=`<div class="ans-box sa${shown?' show':''}"><div class="ans-label">정답</div><div class="ans-value">${q.a}</div>${q.tip?`<div class="ans-tip">${q.tip}</div>`:''}</div>`;
+  }
+
+  document.getElementById('qcard').innerHTML=`
+    <span class="round-label ${lbl}">${r.label}</span>
+    <div class="q-num">Q${qi+1}</div>
+    ${sitHtml}
+    <div class="q-text">${q.q}</div>
+    ${body}
+  `;
+
+  // nav
+  const isLast=qi===total-1, isLastR=ri===rounds.length-1;
+  let navHtml=`<button class="nav-btn" onclick="prev()" ${qi===0&&ri===0?'disabled':''}>← 이전</button>`;
+  if(!shown){
+    navHtml+=`<button class="nav-btn primary" onclick="reveal()">정답 공개</button>`;
+  } else if(isLast&&isLastR){
+    navHtml+=`<button class="nav-btn danger" onclick="endGame()">🏆 완료</button>`;
+  } else if(isLast){
+    navHtml+=`<button class="nav-btn primary" onclick="nextRound()">다음 라운드 →</button>`;
+  } else {
+    navHtml+=`<button class="nav-btn primary" onclick="next()">다음 문항 →</button>`;
+  }
+  document.getElementById('nav').innerHTML=navHtml;
+}
+
+// ── 딴따단 팡파레 (Web Audio API) ──
+function playFanfare(){
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // 딴따단 = 짧은 음 + 짧은 음 + 긴 음 (솔-솔-도)
+    const notes = [
+      { freq: 392.0, start: 0.00, dur: 0.18, vol: 0.55 }, // 솔 (딴)
+      { freq: 392.0, start: 0.20, dur: 0.18, vol: 0.55 }, // 솔 (따)
+      { freq: 523.25,start: 0.40, dur: 0.55, vol: 0.7  }, // 도 (단~)
+      // 화음 레이어 — 밝은 느낌
+      { freq: 493.88,start: 0.40, dur: 0.55, vol: 0.25 }, // 시
+      { freq: 659.25,start: 0.40, dur: 0.55, vol: 0.2  }, // 미
+    ];
+    notes.forEach(n => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(n.freq, ctx.currentTime + n.start);
+      gain.gain.setValueAtTime(0, ctx.currentTime + n.start);
+      gain.gain.linearRampToValueAtTime(n.vol, ctx.currentTime + n.start + 0.02);
+      gain.gain.setValueAtTime(n.vol, ctx.currentTime + n.start + n.dur - 0.08);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + n.start + n.dur);
+      osc.start(ctx.currentTime + n.start);
+      osc.stop(ctx.currentTime + n.start + n.dur + 0.05);
+    });
+  } catch(e) { /* 오디오 미지원 환경 무시 */ }
+}
+
+function reveal(){ playFanfare(); shown=true; render(); }
+function next(){ if(qi<R().qs.length-1){ qi++; shown=false; render(); } }
+function prev(){
+  if(qi>0){ qi--; shown=false; }
+  else if(ri>0){ ri--; qi=R().qs.length-1; shown=false; }
+  render();
+}
+function nextRound(){ if(ri<rounds.length-1){ ri++; qi=0; shown=false; render(); } }
+function goRound(i){ ri=i; qi=0; shown=false; render(); }
+function endGame(){
+  document.getElementById('quiz').style.display='none';
+  document.getElementById('end').style.display='flex';
+}
+</script>
+</body>
+</html>
