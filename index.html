@@ -384,29 +384,27 @@ function render(){
   document.getElementById('nav').innerHTML=navHtml;
 }
 
-// ── 딴따단 팡파레 (Web Audio API) ──
+// ── 경쾌한 3연타 정답음 (게임쇼 느낌) ──
 function playFanfare(){
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    // 딴따단 = 짧은 음 + 짧은 음 + 긴 음 (솔-솔-도)
     const notes = [
-      { freq: 392.0, start: 0.00, dur: 0.18, vol: 0.55 }, // 솔 (딴)
-      { freq: 392.0, start: 0.20, dur: 0.18, vol: 0.55 }, // 솔 (따)
-      { freq: 523.25,start: 0.40, dur: 0.55, vol: 0.7  }, // 도 (단~)
-      // 화음 레이어 — 밝은 느낌
-      { freq: 493.88,start: 0.40, dur: 0.55, vol: 0.25 }, // 시
-      { freq: 659.25,start: 0.40, dur: 0.55, vol: 0.2  }, // 미
+      { freq: 523.25, start: 0.00, dur: 0.10, vol: 0.6 }, // 도
+      { freq: 659.25, start: 0.12, dur: 0.10, vol: 0.6 }, // 미
+      { freq: 783.99, start: 0.24, dur: 0.28, vol: 0.75 }, // 솔 (길게)
+      // 화음
+      { freq: 987.77, start: 0.24, dur: 0.28, vol: 0.25 }, // 시
     ];
     notes.forEach(n => {
       const osc  = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.type = 'triangle';
+      osc.type = 'square';
       osc.frequency.setValueAtTime(n.freq, ctx.currentTime + n.start);
       gain.gain.setValueAtTime(0, ctx.currentTime + n.start);
-      gain.gain.linearRampToValueAtTime(n.vol, ctx.currentTime + n.start + 0.02);
-      gain.gain.setValueAtTime(n.vol, ctx.currentTime + n.start + n.dur - 0.08);
+      gain.gain.linearRampToValueAtTime(n.vol, ctx.currentTime + n.start + 0.01);
+      gain.gain.setValueAtTime(n.vol, ctx.currentTime + n.start + n.dur - 0.05);
       gain.gain.linearRampToValueAtTime(0, ctx.currentTime + n.start + n.dur);
       osc.start(ctx.currentTime + n.start);
       osc.stop(ctx.currentTime + n.start + n.dur + 0.05);
